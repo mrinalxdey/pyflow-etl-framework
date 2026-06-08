@@ -1,0 +1,9 @@
+# environment variables
+.env
+
+# data
+Data/
+
+# logs
+*.log
+logs/
