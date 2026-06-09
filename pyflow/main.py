@@ -8,9 +8,10 @@ setup_logging()
 config = load_config()
 engine = get_engine(config)
 
-file_path = config['etl']['input_path'] + 'yellow_tripdata_2024-01.csv'
+file_path = config['etl']['input_path'] + 'yellow_tripdata_2024-01.parquet'
 file_name = os.path.basename(file_path)
-table_name = file_name.replace(".csv", "")
+table_name = os.path.splitext(file_name)[0]
+print(table_name)
 
 extractor = get_extractor(file_path)
 

@@ -14,6 +14,10 @@ class BaseExtractor(ABC):
     def validate_file(self, file_path):
         if not os.path.exists(file_path):
             raise DataSourceError(f"File not found: {file_path}")
+    
+    def chunk_dataframe(self, df):
+        for start in range(0, len(df), self.chunk_size):
+            yield df.iloc[start:start + self.chunk_size]
 
     @abstractmethod
     def extract(self, file_path):
@@ -32,8 +36,15 @@ class JSONExtractor(BaseExtractor):
     def extract(self, file_path):
         self.validate_file(file_path)
 
-        for chunk in pd.read_json(file_path, chunksize=self.chunk_size):
-            yield chunk
+        ext = os.path.splitext(file_path)[1].lower()
+
+        if ext == '.jsonl':
+            for chunk in pd.read_json(file_path, lines=True, chunksize=self.chunk_size):
+                yield chunk
+        
+        elif ext == '.json':
+            df = pd.read_json(file_path)
+            yield from self.chunk_dataframe(df)
 
 class ParquetExtractor(BaseExtractor):
     @timing_decorator
@@ -41,8 +52,7 @@ class ParquetExtractor(BaseExtractor):
         self.validate_file(file_path)
         
         df = pd.read_parquet(file_path)
-        for start in range(0, len(df), self.chunk_size):
-            yield df.iloc[start:start + self.chunk_size]
+        yield from self.chunk_dataframe(df)
 
     
 
@@ -61,7 +71,7 @@ def get_extractor(file_path):
 
     if file_type == '.csv':
         return CSVExtractor(config)
-    elif file_type == '.json':
+    elif file_type == '.json' or file_type == '.jsonl':
         return JSONExtractor(config)
     elif file_type == '.parquet':
         return ParquetExtractor(config)
