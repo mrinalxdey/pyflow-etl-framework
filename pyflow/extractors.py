@@ -1,8 +1,7 @@
 import pandas as pd
 import os
 from abc import ABC, abstractmethod
-from utils import DataSourceError, timing_decorator
-from utils import load_config
+from utils import DataSourceError, timing_decorator, load_config
 
 config = load_config()
 
