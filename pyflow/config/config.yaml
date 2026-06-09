@@ -3,3 +3,8 @@ database:
   host: localhost
   port: 5432
   name: pyflow_etl
+
+etl:
+  chunk_size: 10000
+  input_path: Data/
+  file_types: [csv, json, parquet]
