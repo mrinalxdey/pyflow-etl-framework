@@ -1,9 +1,17 @@
+import os
 import json
 import yaml
 import time
 import logging
 from pathlib import Path
 from functools import wraps
+from sqlalchemy import create_engine
+from dotenv import load_dotenv
+
+load_dotenv()
+
+username = os.environ["DB_USERNAME"]
+password = os.environ["DB_PASSWORD"]
 
 def timing_decorator(func):
     @wraps(func)
@@ -51,7 +59,22 @@ def load_config(config_path='pyflow/config/config.yaml'):
     else:
         raise ValueError("Supported config formats are YAML (.yaml/.yml) and JSON (.json)")
 
+def get_engine(config):
+    '''
+    Creates an engine/connection to postgresql
 
+    Parameters:
+    config : dict
+        dictionary containing database credentials
+
+    Returns:
+    create_engine()
+        a function with connection string to the database
+    '''
+    db = config['database']
+    return create_engine(
+        f"{db['driver']}://{username}:{password}@{db['host']}:{db['port']}/{db['db_name']}"
+    )
 
 class PyFlowError(Exception):
     """Base exception for PyFlow"""

@@ -2,7 +2,7 @@ database:
   driver: postgresql+psycopg2
   host: localhost
   port: 5432
-  name: pyflow_etl
+  db_name: pyflow_etl
 
 etl:
   chunk_size: 10000
