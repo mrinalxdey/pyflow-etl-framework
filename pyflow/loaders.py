@@ -1,10 +1,9 @@
 from sqlalchemy import Engine
 from pandas import DataFrame
 import logging
-from utils import load_config, get_engine, timing_decorator, LoadError
+from utils import timing_decorator, LoadError
 
 logger = logging.getLogger(__name__)
-
 
 @timing_decorator
 def load_to_db(df: DataFrame, table_name: str, engine: Engine, chunk_size: int =10000) -> None:

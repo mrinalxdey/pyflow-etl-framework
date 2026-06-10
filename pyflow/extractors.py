@@ -5,10 +5,9 @@ from typing import Any, Generator
 from pandas import DataFrame
 from abc import ABC, abstractmethod
 from config.logging_config import setup_logging
-from utils import DataSourceError, timing_decorator, load_config
+from utils import DataSourceError, ValidationError
 
 # Configure logging
-setup_logging()
 logger = logging.getLogger(__name__)
 
 class BaseExtractor(ABC):
@@ -20,6 +19,11 @@ class BaseExtractor(ABC):
         if not os.path.exists(file_path):
             raise DataSourceError(f"File not found: {file_path}")
         
+        if os.path.getsize(file_path) == 0:
+            raise ValidationError(
+                f"File is empty: {file_path}"
+            )
+
         logger.info(f"Validated file: {file_path}")
 
     def chunk_dataframe(self, df: DataFrame) -> Generator[DataFrame, None, None]:

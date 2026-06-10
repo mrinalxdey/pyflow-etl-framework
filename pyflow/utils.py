@@ -4,7 +4,7 @@ import yaml
 import time
 import logging
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Any
 from functools import wraps
 from sqlalchemy import create_engine, Engine
 from dotenv import load_dotenv
@@ -31,7 +31,7 @@ def timing_decorator(func: Callable) -> Callable:
     return wrapper
 
 
-def load_config(config_path: str ='pyflow/config/config.yaml') -> dict:
+def load_config(config_path: str ='pyflow/config/config.yaml') -> dict[str, Any]:
     '''
     Load .yaml or .json configuration file.
 
@@ -42,19 +42,19 @@ def load_config(config_path: str ='pyflow/config/config.yaml') -> dict:
     Returns:
     dict - parsed configuration
     '''
-    config_path = Path(config_path)
+    path = Path(config_path)
 
-    if not config_path.exists():
+    if not path.exists():
         raise FileNotFoundError(
-            f"Configuration file not found: {config_path}"
+            f"Configuration file not found: {path}"
         )
     
-    if config_path.suffix.lower() in ['.yaml', '.yml']:
-        with open(config_path, 'r') as file:
+    if path.suffix.lower() in ['.yaml', '.yml']:
+        with open(path) as file:
             return yaml.safe_load(file)
         
-    elif config_path.suffix.lower() == '.json':
-        with open(config_path, 'r') as file:
+    elif path.suffix.lower() == '.json':
+        with open(path, 'r') as file:
             return json.load(file)
         
     else:
