@@ -2,7 +2,7 @@ import os
 import logging
 from utils import load_config, get_engine, timing_decorator
 from extractors import get_extractor
-from loaders import load_chunk_to_db
+from loaders import load_to_db
 from config.logging_config import setup_logging
 
 # Configure logging
@@ -19,7 +19,7 @@ file_name = os.path.basename(file_path)
 table_name = os.path.splitext(file_name)[0].replace('-',"_").replace(' ',"_")
 
 # Select appropriate extractor based on file type
-extractor = get_extractor(file_path)
+extractor = get_extractor(file_path, config)
 
 # Execute ETL pipeline
 @timing_decorator
@@ -28,7 +28,7 @@ def run_pipeline() -> None:
         logger.info("Pipeline started.")
 
         for chunk in extractor.extract(file_path):
-            load_chunk_to_db(chunk, table_name, engine, chunk_size=config['etl']['chunk_size'])
+            load_to_db(chunk, table_name, engine, chunk_size=config['etl']['chunk_size'])
         
         logger.info("Pipeline completed successfully.")
 

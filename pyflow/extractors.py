@@ -1,11 +1,15 @@
 import pandas as pd
 import os
+import logging
 from typing import Any, Generator
 from pandas import DataFrame
 from abc import ABC, abstractmethod
+from config.logging_config import setup_logging
 from utils import DataSourceError, timing_decorator, load_config
 
-config = load_config()
+# Configure logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 class BaseExtractor(ABC):
 
@@ -15,27 +19,32 @@ class BaseExtractor(ABC):
     def validate_file(self, file_path: str):
         if not os.path.exists(file_path):
             raise DataSourceError(f"File not found: {file_path}")
-    
-    def chunk_dataframe(self, df):
+        
+        logger.info(f"Validated file: {file_path}")
+
+    def chunk_dataframe(self, df: DataFrame) -> Generator[DataFrame, None, None]:
         for start in range(0, len(df), self.chunk_size):
             yield df.iloc[start:start + self.chunk_size]
+
+    def log_extraction_start(self, file_path: str) -> None:
+        logger.info(f"Starting extraction from {file_path}")
 
     @abstractmethod
     def extract(self, file_path: str):
         raise NotImplementedError
 
 class CSVExtractor(BaseExtractor):
-    @timing_decorator
     def extract(self, file_path: str) -> Generator[DataFrame, None, None]:
         self.validate_file(file_path)
-        
+        self.log_extraction_start(file_path)
+
         for chunk in pd.read_csv(file_path, chunksize=self.chunk_size):
             yield chunk
 
 class JSONExtractor(BaseExtractor):
-    @timing_decorator
     def extract(self, file_path: str) -> Generator[DataFrame, None, None]:
         self.validate_file(file_path)
+        self.log_extraction_start(file_path)
 
         ext = os.path.splitext(file_path)[1].lower()
 
@@ -48,16 +57,17 @@ class JSONExtractor(BaseExtractor):
             yield from self.chunk_dataframe(df)
 
 class ParquetExtractor(BaseExtractor):
-    @timing_decorator
     def extract(self, file_path: str) -> Generator[DataFrame, None, None]:
         self.validate_file(file_path)
-        
+        self.log_extraction_start(file_path)
+
+        logger.info(f"Extracting Parquet file: {file_path}")
         df = pd.read_parquet(file_path)
         yield from self.chunk_dataframe(df)
 
     
 
-def get_extractor(file_path: str) -> BaseExtractor:
+def get_extractor(file_path: str, config: dict) -> BaseExtractor:
     '''
     Gets the required extractor for the provided file
 

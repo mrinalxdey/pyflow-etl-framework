@@ -3,13 +3,11 @@ from pandas import DataFrame
 import logging
 from utils import load_config, get_engine, timing_decorator, LoadError
 
-config = load_config()
-engine = get_engine(config)
 logger = logging.getLogger(__name__)
 
 
 @timing_decorator
-def load_chunk_to_db(df: DataFrame, table_name: str, engine: Engine, chunk_size: int =10000) -> None:
+def load_to_db(df: DataFrame, table_name: str, engine: Engine, chunk_size: int =10000) -> None:
     try:
         df.to_sql(
             name = table_name,

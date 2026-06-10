@@ -30,7 +30,7 @@ def timing_decorator(func: Callable) -> Callable:
 
     return wrapper
 
-@timing_decorator
+
 def load_config(config_path: str ='pyflow/config/config.yaml') -> dict:
     '''
     Load .yaml or .json configuration file.
