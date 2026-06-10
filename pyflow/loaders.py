@@ -1,16 +1,15 @@
-from sqlalchemy import text
+from sqlalchemy import Engine
+from pandas import DataFrame
 import logging
-from utils import load_config, get_engine
+from utils import load_config, get_engine, timing_decorator, LoadError
 
 config = load_config()
 engine = get_engine(config)
 logger = logging.getLogger(__name__)
 
-class LoadError(Exception):
-    """Raised when data loading fails."""
-    pass
 
-def load_chunk_to_db(df, table_name, engine, chunk_size=10000):
+@timing_decorator
+def load_chunk_to_db(df: DataFrame, table_name: str, engine: Engine, chunk_size: int =10000) -> None:
     try:
         df.to_sql(
             name = table_name,

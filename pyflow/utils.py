@@ -4,8 +4,9 @@ import yaml
 import time
 import logging
 from pathlib import Path
+from typing import Callable
 from functools import wraps
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Engine
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +14,7 @@ load_dotenv()
 username = os.environ["DB_USERNAME"]
 password = os.environ["DB_PASSWORD"]
 
-def timing_decorator(func):
+def timing_decorator(func: Callable) -> Callable:
     @wraps(func)
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -30,7 +31,7 @@ def timing_decorator(func):
     return wrapper
 
 @timing_decorator
-def load_config(config_path='pyflow/config/config.yaml'):
+def load_config(config_path: str ='pyflow/config/config.yaml') -> dict:
     '''
     Load .yaml or .json configuration file.
 
@@ -59,7 +60,7 @@ def load_config(config_path='pyflow/config/config.yaml'):
     else:
         raise ValueError("Supported config formats are YAML (.yaml/.yml) and JSON (.json)")
 
-def get_engine(config):
+def get_engine(config: dict) -> Engine:
     '''
     Creates an engine/connection to postgresql
 
