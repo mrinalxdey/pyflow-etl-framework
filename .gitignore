@@ -6,7 +6,6 @@ Data/
 
 # logs
 *.log
-pyflow/config/logging_config.py
 
 # pycache
 **/__pycache__/
