@@ -5,6 +5,6 @@ database:
   db_name: pyflow_etl
 
 etl:
-  chunk_size: 10000
+  chunk_size: 100000
   input_path: Data/
   file_types: [csv, json, parquet]
