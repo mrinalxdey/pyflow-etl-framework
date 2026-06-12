@@ -15,6 +15,21 @@ class BaseExtractor(ABC):
     def __init__(self, config: dict) -> None:
         self.chunk_size = config['etl']['chunk_size']
 
+    def detect_encoding(self, file_path: str) -> str:
+        encodings = ['utf-8', 'latin1', "cp1252"]
+
+        with open(file_path, "rb") as f:
+            sample = f.read(10000)
+
+        for encoding in encodings:
+            try:
+                sample.decode(encoding)
+                logger.info(f"Detected encoding '{encoding}' for {file_path}")
+                return encoding
+            
+            except UnicodeDecodeError:
+                continue
+
     def validate_file(self, file_path: str):
         if not os.path.exists(file_path):
             raise DataSourceError(f"File not found: {file_path}")
@@ -39,25 +54,27 @@ class BaseExtractor(ABC):
 
 class CSVExtractor(BaseExtractor):
     def extract(self, file_path: str) -> Generator[DataFrame, None, None]:
+        encoding = self.detect_encoding(file_path)
         self.validate_file(file_path)
         self.log_extraction_start(file_path)
 
-        for chunk in pd.read_csv(file_path, chunksize=self.chunk_size):
+        for chunk in pd.read_csv(file_path, encoding=encoding, chunksize=self.chunk_size):
             yield chunk
 
 class JSONExtractor(BaseExtractor):
     def extract(self, file_path: str) -> Generator[DataFrame, None, None]:
+        encoding = self.detect_encoding(file_path)
         self.validate_file(file_path)
         self.log_extraction_start(file_path)
 
         ext = os.path.splitext(file_path)[1].lower()
 
         if ext == '.jsonl':
-            for chunk in pd.read_json(file_path, lines=True, chunksize=self.chunk_size):
+            for chunk in pd.read_json(file_path, encoding=encoding, lines=True, chunksize=self.chunk_size):
                 yield chunk
         
         elif ext == '.json':
-            df = pd.read_json(file_path)
+            df = pd.read_json(file_path, encoding=encoding)
             yield from self.chunk_dataframe(df)
 
 class ParquetExtractor(BaseExtractor):
