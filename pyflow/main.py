@@ -1,5 +1,6 @@
 import os
 import logging
+import shutil
 from utils import load_config, get_engine, timing_decorator, PyFlowError
 from extractors import get_extractor
 from loaders import load_to_db
@@ -13,6 +14,28 @@ logger = logging.getLogger(__name__)
 config = load_config()
 engine = get_engine(config)
 
+def process_file(file_path: str) -> None:
+    file_name = os.path.basename(file_path)
+    
+    try:
+        logger.info(f"Processing file: {file_name}")
+        
+        # Select appropriate extractor based on file type
+        extractor = get_extractor(file_path, config)
+
+        table_name = os.path.splitext(file_name)[0].replace('-',"_").replace(' ',"_")
+
+        # Loading the data into the database in chunks
+        for chunk in extractor.extract(file_path):
+            load_to_db(chunk, table_name, engine, chunk_size=config['etl']['chunk_size'])
+
+        logger.info(f"Successfully processed: {file_name}")
+        
+    except ValueError as e:
+        logger.warning(f"Skipping unsupported file: {file_name}")
+
+    except PyFlowError as e:
+        logger.error(f"Failed processing {file_name}: {e}")
 
 # Execute ETL pipeline
 @timing_decorator
@@ -29,25 +52,10 @@ def run_pipeline() -> None:
             logger.info(f"Skipping directory: {file_name}")
             continue
 
-        try:
-            logger.info(f"Processing file: {file_name}")
-            
-            # Select appropriate extractor based on file type
-            extractor = get_extractor(file_path, config)
-
-            table_name = os.path.splitext(file_name)[0].replace('-',"_").replace(' ',"_")
-
-            # Loading the data into the database in chunks
-            for chunk in extractor.extract(file_path):
-                load_to_db(chunk, table_name, engine, chunk_size=config['etl']['chunk_size'])
-        
-        except ValueError as e:
-            logger.warning(f"Skipping unsupported file: {file_name}")
-
-        except PyFlowError as e:
-            logger.error(f"Failed processing {file_name}: {e}")
+        process_file(file_path)
 
     logger.info("Pipeline completed successfully.")
 
 # Run the Pipeline
-run_pipeline()
+if __name__ == "__main__":
+    run_pipeline()
