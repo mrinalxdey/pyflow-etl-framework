@@ -6,6 +6,7 @@ from pandas import DataFrame
 from abc import ABC, abstractmethod
 from config.logging_config import setup_logging
 from utils import DataSourceError, ValidationError
+from validators import validate_csv_structure
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -55,10 +56,20 @@ class BaseExtractor(ABC):
 class CSVExtractor(BaseExtractor):
     def extract(self, file_path: str) -> Generator[DataFrame, None, None]:
         encoding = self.detect_encoding(file_path)
+        
+        bad_rows = validate_csv_structure(
+            file_path=file_path,
+            encoding=encoding,
+            error_file=os.path.join("pyflow","logs",f"{os.path.basename(file_path)}_errors.log")
+        )
+
+        if bad_rows:
+            logger.warning(f"Found {bad_rows} malformed rows in {file_path}")
+        
         self.validate_file(file_path)
         self.log_extraction_start(file_path)
 
-        for chunk in pd.read_csv(file_path, encoding=encoding, chunksize=self.chunk_size):
+        for chunk in pd.read_csv(file_path, on_bad_lines='skip', encoding=encoding, chunksize=self.chunk_size):
             yield chunk
 
 class JSONExtractor(BaseExtractor):
