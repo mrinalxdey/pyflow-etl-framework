@@ -7,4 +7,4 @@ database:
 etl:
   chunk_size: 100000
   input_path: Data/
-  file_types: [csv, json, parquet]
+  file_types: [csv, json, jsonl, parquet, gz, zip]
