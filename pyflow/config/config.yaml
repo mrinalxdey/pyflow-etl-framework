@@ -4,7 +4,18 @@ database:
   port: 5432
   db_name: pyflow_etl
 
+# database:
+#   driver: mysql+pymysql
+#   host: localhost
+#   port: 3306
+#   db_name: pyflow_etl
+
 etl:
   chunk_size: 100000
   input_path: Data/
   file_types: [csv, json, jsonl, parquet, gz, zip]
+
+dtypes:
+  customer_id: int32
+  city: category
+  amount: float32
