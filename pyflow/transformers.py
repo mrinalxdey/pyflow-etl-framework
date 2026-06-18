@@ -51,3 +51,83 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
         df[col] = df[col].ffill()
     
     return df
+
+def handle_fare_outliers(df: pd.DataFrame) -> pd.DataFrame:
+    if "fare_amount" not in df.columns:
+        return df
+    
+    q1 = df['fare_amount'].quantile(0.25)
+    q3 = df['fare_amount'].quantile(0.75)
+
+    iqr = q3 - q1
+
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+
+    df = df[
+        (df["fare_amount"] >= lower_bound)
+        & (df["fare_amount"] <= upper_bound)
+    ]
+
+    return df
+
+def remove_duplicate_trips(df: pd.DataFrame) -> pd.DataFrame:
+    business_keys = [
+        "trip_start_time",
+        "pickup_location", 
+        "dropoff_location"
+    ]
+
+    existing_keys = [
+        col for col in business_keys
+        if col in df.columns
+    ]
+
+    if len(existing_keys) != len(business_keys):
+        return df
+    
+    return df.drop_duplicates(subset=business_keys, keep="first")
+
+def merge_trip_data(trips_df: pd.DataFrame = pd.read_csv("Data/yellow_tripdata_2024-01.csv"), 
+                    weather_df: pd.DataFrame = pd.read_csv("Data/weather.csv"), 
+                    holidays_df: pd.DataFrame = pd.read_csv("Data/holidays.csv")) -> pd.DataFrame:
+    
+    merged_df = trips_df.merge(
+        weather_df,
+        how="left",
+        on="date",
+        validate="many_to_one"
+    )
+    merged_df = merged_df.merge(
+        holidays_df,
+        how="left",
+        on="date",
+        validate="many_to_one"
+    )
+
+    return merged_df
+
+def handle_datetime_features(df: pd.DataFrame) -> pd.DataFrame:
+
+    for col in df.columns:
+        try:
+            parsed = pd.to_datetime(
+                df[col],
+                errors="coerce"
+            )
+
+            # Skip if most values are not valid dates
+            if parsed.notna().mean() < 0.8:
+                continue
+
+            df[col] = parsed
+            df[f"{col}_hour"] = parsed.dt.hour
+            df[f"{col}_day_of_week"] = parsed.dt.day_name()
+            df[f"{col}_is_weekend"] = (
+                parsed.dt.dayofweek >= 5
+            )
+
+        except Exception:
+            continue
+
+    return df

@@ -5,7 +5,7 @@ from utils import load_config, get_engine, timing_decorator, PyFlowError
 from extractors import get_extractor
 from loaders import load_to_db
 from config.logging_config import setup_logging
-from transformers import optimize_memory, handle_missing_values
+from transformers import optimize_memory, handle_missing_values, handle_fare_outliers, remove_duplicate_trips, handle_datetime_features
 
 # Configure logging
 setup_logging()
@@ -28,7 +28,10 @@ def process_file(file_path: str) -> None:
 
         # Loading the data into the database in chunks
         for chunk in extractor.extract(file_path):
+            # chunk = handle_datetime_features(chunk)
             chunk = handle_missing_values(chunk)
+            chunk = remove_duplicate_trips(chunk)
+            chunk = handle_fare_outliers(chunk)
             chunk = optimize_memory(chunk)
             load_to_db(chunk, table_name, engine, chunk_size=config['etl']['chunk_size'])
 
