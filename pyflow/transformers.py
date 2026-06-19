@@ -1,21 +1,25 @@
 import pandas as pd
+from utils import TransformationError
 
 def optimize_memory(df: pd.DataFrame) -> pd.DataFrame:
-    # Downcast integers
-    for col in df.select_dtypes(include=["int"]):
-        df[col] = pd.to_numeric(df[col], downcast="integer")
+    try:
+        # Downcast integers
+        for col in df.select_dtypes(include=["int"]):
+            df[col] = pd.to_numeric(df[col], downcast="integer")
 
-    # Downcast floats
-    for col in df.select_dtypes(include=["float"]):
-        df[col] = pd.to_numeric(df[col], downcast="float")
+        # Downcast floats
+        for col in df.select_dtypes(include=["float"]):
+            df[col] = pd.to_numeric(df[col], downcast="float")
 
-    # Convert low-cardinality object columns to category
-    for col in df.select_dtypes(include=["object"]):
-        if len(df) > 0:
-            unique_ratio = df[col].nunique(dropna=False) / len(df)
+        # Convert low-cardinality object columns to category
+        for col in df.select_dtypes(include=["object"]):
+            if len(df) > 0:
+                unique_ratio = df[col].nunique(dropna=False) / len(df)
 
-            if unique_ratio < 0.05:
-                df[col] = df[col].astype("category")
+                if unique_ratio < 0.05:
+                    df[col] = df[col].astype("category")
+    except Exception as e:
+        raise TransformationError(f"Failed to optimize memory: {e}") from e
 
     return df
 

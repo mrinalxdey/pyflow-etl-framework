@@ -1,5 +1,6 @@
 from sqlalchemy import Engine
 from pandas import DataFrame
+from pathlib import Path
 import logging
 from utils import timing_decorator, LoadError
 
@@ -24,3 +25,22 @@ def load_to_db(df: DataFrame, table_name: str, engine: Engine, chunk_size: int =
         raise LoadError(
             f"Could not load data into table '{table_name}'"
         ) from e
+    
+def export_data(df: DataFrame, output_path: str) -> None:
+    path = Path(output_path)
+    suffix = path.suffix.lower()
+
+    if suffix == ".csv":
+        df.to_csv(path, index=False, compression="gzip")
+
+    elif suffix == ".json":
+        df.to_json(path, orient="records", indent=4, compression="gzip")
+
+    elif suffix == ".parquet":
+        df.to_parquet(path, index=False, compression="snappy")
+
+    elif suffix in (".xlsx", ".xls"):
+        df.to_excel(path, index=False)
+
+    else:
+        raise ValueError(f"Unsupported file format: {suffix}")
