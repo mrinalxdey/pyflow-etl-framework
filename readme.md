@@ -52,7 +52,6 @@ A configurable Python-based ETL (Extract, Transform, Load) framework that proces
 ├── .env
 ├── .env.example
 ├── .gitignore
-├── app.log
 ├── README.md
 └── requirements.txt
 ```
@@ -72,8 +71,8 @@ A configurable Python-based ETL (Extract, Transform, Load) framework that proces
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/mrinalxdey/pyflow-etl-framework.git
+cd pyflow-etl-framework
 ```
 
 ### 2. Create a virtual environment
@@ -129,7 +128,7 @@ Example:
 
 ```yaml
 database:
-  driver: postgresql
+  driver: postgresql+psycopg2
   host: localhost
   port: 5432
   db_name: pyflow_etl
@@ -155,7 +154,7 @@ database:
 Run the pipeline once:
 
 ```bash
-python -m pyflow.main
+python pyflow/main.py
 ```
 
 The pipeline will:
@@ -174,7 +173,7 @@ The pipeline will:
 Start the file watcher:
 
 ```bash
-python -m pyflow.watcher
+python pyflow/watcher.py
 ```
 
 The watcher continuously monitors the configured input directory and automatically processes newly added files.
@@ -186,17 +185,17 @@ The watcher continuously monitors the configured input directory and automatical
 ### Terminal 1
 
 ```bash
-python -m pyflow.watcher
+python pyflow/watcher.py
 ```
 
 ### Terminal 2
 
 ```bash
-python -m pyflow.main
+python pyflow/main.py
 ```
 
-- `pyflow.main` performs a one-time ETL execution.
-- `pyflow.watcher` continuously monitors for newly added files.
+- `pyflow/main.py` performs a one-time ETL execution.
+- `pyflow/watcher.py` continuously monitors for newly added files.
 
 ---
 
@@ -219,33 +218,21 @@ Logs include:
 
 ---
 
-## Custom Exceptions
-
-The framework provides the following custom exceptions:
-
-- `PyFlowError`
-- `DataSourceError`
-- `ValidationError`
-- `TransformationError`
-- `LoadError`
-
----
-
 ## Example Workflow
 
 1. Configure the database credentials in `.env`.
 2. Update `config.yaml` as required.
-3. Place data files in the configured input directory.
-4. Start the watcher:
+3. Start the watcher.
+4. Place data files in the configured input directory.
 
 ```bash
-python -m pyflow.watcher
+python pyflow/watcher.py
 ```
 
 Or execute a one-time run:
 
 ```bash
-python -m pyflow.main
+python pyflow/main.py
 ```
 
 5. Verify logs and database tables after processing completes.
@@ -255,5 +242,3 @@ python -m pyflow.main
 ## Authors
 
 **Mrinal Dey**
-
-Assignment 2 - Tutedude ETL Framework Project
