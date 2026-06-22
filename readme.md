@@ -154,7 +154,7 @@ database:
 Run the pipeline once:
 
 ```bash
-python pyflow/main.py
+python -m pyflow.main
 ```
 
 The pipeline will:
@@ -173,7 +173,7 @@ The pipeline will:
 Start the file watcher:
 
 ```bash
-python pyflow/watcher.py
+python -m pyflow.watcher
 ```
 
 The watcher continuously monitors the configured input directory and automatically processes newly added files.
@@ -185,17 +185,17 @@ The watcher continuously monitors the configured input directory and automatical
 ### Terminal 1
 
 ```bash
-python pyflow/watcher.py
+python -m pyflow.watcher
 ```
 
 ### Terminal 2
 
 ```bash
-python pyflow/main.py
+python -m pyflow.main
 ```
 
-- `pyflow/main.py` performs a one-time ETL execution.
-- `pyflow/watcher.py` continuously monitors for newly added files.
+- `pyflow.main` performs a one-time ETL execution.
+- `pyflow.watcher` continuously monitors for newly added files.
 
 ---
 
@@ -226,13 +226,13 @@ Logs include:
 4. Place data files in the configured input directory.
 
 ```bash
-python pyflow/watcher.py
+python -m pyflow.watcher
 ```
 
 Or execute a one-time run:
 
 ```bash
-python pyflow/main.py
+python -m pyflow.main
 ```
 
 5. Verify logs and database tables after processing completes.
