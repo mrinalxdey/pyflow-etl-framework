@@ -1,6 +1,6 @@
 import csv
 import os
-from utils import ValidationError
+from pyflow.utils import ValidationError
 
 def validate_csv_structure(file_path: str, encoding: str, error_file: str) -> int:
     bad_rows = []

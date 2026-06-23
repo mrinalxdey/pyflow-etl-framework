@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import TransformationError
+from pyflow.utils import TransformationError
 
 def optimize_memory(df: pd.DataFrame) -> pd.DataFrame:
     try:

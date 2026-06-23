@@ -3,10 +3,9 @@ import time
 import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from extractors import get_extractor
-from utils import load_config
-from config.logging_config import setup_logging
-from main import process_file
+from pyflow.utils import load_config
+from pyflow.config.logging_config import setup_logging
+from pyflow.main import process_file
 
 setup_logging()
 logger = logging.getLogger(__name__)

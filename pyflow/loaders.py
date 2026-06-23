@@ -2,7 +2,7 @@ from sqlalchemy import Engine
 from pandas import DataFrame
 from pathlib import Path
 import logging
-from utils import timing_decorator, LoadError
+from pyflow.utils import timing_decorator, LoadError
 
 logger = logging.getLogger(__name__)
 

@@ -5,9 +5,9 @@ import logging
 from typing import Any, Generator
 from pandas import DataFrame
 from abc import ABC, abstractmethod
-from config.logging_config import setup_logging
-from utils import DataSourceError, ValidationError, load_config
-from validators import validate_csv_structure
+from pyflow.config.logging_config import setup_logging
+from pyflow.utils import DataSourceError, ValidationError, load_config
+from pyflow.validators import validate_csv_structure
 
 # Configure logging
 setup_logging()
