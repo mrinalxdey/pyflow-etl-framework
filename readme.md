@@ -52,7 +52,6 @@ A configurable Python-based ETL (Extract, Transform, Load) framework that proces
 ├── .env
 ├── .env.example
 ├── .gitignore
-├── app.log
 ├── README.md
 └── requirements.txt
 ```
@@ -72,8 +71,8 @@ A configurable Python-based ETL (Extract, Transform, Load) framework that proces
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/mrinalxdey/pyflow-etl-framework.git
+cd pyflow-etl-framework
 ```
 
 ### 2. Create a virtual environment
@@ -129,7 +128,7 @@ Example:
 
 ```yaml
 database:
-  driver: postgresql
+  driver: postgresql+psycopg2
   host: localhost
   port: 5432
   db_name: pyflow_etl
@@ -219,24 +218,12 @@ Logs include:
 
 ---
 
-## Custom Exceptions
-
-The framework provides the following custom exceptions:
-
-- `PyFlowError`
-- `DataSourceError`
-- `ValidationError`
-- `TransformationError`
-- `LoadError`
-
----
-
 ## Example Workflow
 
 1. Configure the database credentials in `.env`.
 2. Update `config.yaml` as required.
-3. Place data files in the configured input directory.
-4. Start the watcher:
+3. Start the watcher.
+4. Place data files in the configured input directory.
 
 ```bash
 python -m pyflow.watcher
@@ -255,5 +242,3 @@ python -m pyflow.main
 ## Authors
 
 **Mrinal Dey**
-
-Assignment 2 - Tutedude ETL Framework Project
