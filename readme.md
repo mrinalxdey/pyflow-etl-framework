@@ -197,8 +197,26 @@ python -m pyflow.main
 - `pyflow.main` performs a one-time ETL execution.
 - `pyflow.watcher` continuously monitors for newly added files.
 
----
+## Command Line Interface
 
+Run a full ETL load:
+
+```bash
+python pyflow.py --config pyflow/config/config.yaml --mode full
+```
+
+Run an incremental ETL load:
+
+```bash
+python pyflow.py --config pyflow/config/config.yaml --mode incremental
+```
+
+Start the file watcher:
+
+```bash
+python pyflow.py --watch
+```
+---
 ## Logging
 
 Logs are stored in:

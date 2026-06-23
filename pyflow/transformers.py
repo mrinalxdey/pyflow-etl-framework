@@ -1,8 +1,10 @@
 import pandas as pd
+import pdb
 from pyflow.utils import TransformationError
 
 def optimize_memory(df: pd.DataFrame) -> pd.DataFrame:
     try:
+        # pdb.set_trace()
         # Downcast integers
         for col in df.select_dtypes(include=["int"]):
             df[col] = pd.to_numeric(df[col], downcast="integer")
